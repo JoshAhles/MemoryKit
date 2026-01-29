@@ -250,9 +250,9 @@ export function initBrainScene(canvas) {
     uniforms: {
       uScanY: { value: scanState.scanY },
       uScanWidth: { value: SCAN_WIDTH },
-      uColor: { value: new THREE.Color(0xdde3e9) },
+      uColor: { value: new THREE.Color(0xe2e8ef) },
       uScanColor: { value: new THREE.Color(0x38bdf8) },
-      uOpacity: { value: 0.85 },
+      uOpacity: { value: 0.9 },
     },
     vertexShader: scanVertexShader,
     fragmentShader: scanFragmentShader,

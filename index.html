@@ -42,8 +42,8 @@
       <section class="mk-hero" aria-labelledby="mk-hero-title">
         <div class="mk-hero-copy">
           <h1 id="mk-hero-title" class="mk-hero-title">
-            A persistent memory layer<br />
-            for your AI tools.
+            A persistent memory<br />
+            layer for your AI tools.
           </h1>
           <p class="mk-hero-subtitle">
             MemoryKit is a user-owned memory bank for your expertise, preferences, and ongoing work —
@@ -72,7 +72,7 @@
             <div id="sib-container" class="sib-container--large sib-container--vertical">
               <form id="sib-form" method="POST" action="https://2b8ceb88.sibforms.com/serve/MUIFAAHCKo-IjyqjBMqnm9_gZRGEYhYaivW_UZwYaOVJW94rrpSwgZ84OUvvkXZR1D6mwiruG8bvj9OvOboHNPtbKTNlkPxZPJgnkl-SizdBfmsKnIF0AJMFlUIDAnKnVCWllEnM9BJNkWC7NOKBuRJmSxH8qsFQQe2-_VEN5cfB4FDOyHVKi7VowNl3k-0MHIQaxIIdMs7g96j5NQ==" data-type="subscription">
                 <div class="mk-waitlist-row">
-                  <input class="mk-input input" type="email" id="EMAIL" name="EMAIL" autocomplete="off" placeholder="you@company.com" required data-required="true" aria-describedby="mk-waitlist-note" />
+                  <input class="mk-input input" type="email" id="EMAIL" name="EMAIL" autocomplete="off" placeholder="you@email.com" required data-required="true" aria-describedby="mk-waitlist-note" />
                   <button class="mk-button-primary sib-form-block__button sib-form-block__button-with-loader" type="submit">
                     <svg class="icon clickable__icon progress-indicator__icon sib-hide-loader-icon" viewBox="0 0 512 512" aria-hidden="true"><path d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" /></svg>
                     Join waitlist
@@ -82,7 +82,7 @@
                 <input type="hidden" name="locale" value="en" />
               </form>
             </div>
-            <p id="mk-waitlist-note" class="mk-waitlist-note">No spam. We’ll email only when there’s something real to try.</p>
+            <p id="mk-waitlist-note" class="mk-waitlist-note">No spam. Only meaningful updates.</p>
             <p id="mk-waitlist-confirm" class="mk-waitlist-message mk-waitlist-message--success" role="status" aria-live="polite" style="display: none;"></p>
           </div>
         </div>
@@ -122,7 +122,7 @@
         function showConfirm(msg) {
           if (!confirmEl) return;
           confirmEl.className = 'mk-waitlist-message mk-waitlist-message--success';
-          confirmEl.textContent = msg || "You're on the list. We'll email you when there's something real to try.";
+          confirmEl.textContent = msg || "You're on the list. We'll only email when there's something meaningful.";
           confirmEl.style.display = 'block';
           if (formRow) formRow.style.display = 'none';
           if (noteEl) noteEl.style.display = 'none';

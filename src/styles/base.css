@@ -6,7 +6,10 @@
   --mk-accent: #38bdf8;
   --mk-accent-soft: rgba(56, 189, 248, 0.25);
   --mk-border-subtle: rgba(148, 163, 184, 0.3);
+  --mk-glass-border: rgba(255, 255, 255, 0.06);
   --mk-radius-lg: 18px;
+  --mk-radius-card: 16px;
+  --mk-radius-sm: 10px;
   --mk-radius-pill: 999px;
   --mk-shadow-soft: 0 24px 80px rgba(15, 23, 42, 0.7);
   --mk-font-sans:
@@ -20,7 +23,12 @@
   box-sizing: border-box;
 }
 
-html,
+html {
+  margin: 0;
+  padding: 0;
+  background: var(--mk-bg);
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -127,97 +135,130 @@ body.mk-body {
 .mk-hero-reinforce {
   margin-top: 4px;
   display: grid;
-  gap: 2px;
+  gap: 6px;
   color: var(--mk-fg-subtle);
   font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
 }
 
+.mk-hero-reinforce p {
+  margin: 0;
+  opacity: 0;
+  animation: mk-reinforce-fade 0.45s ease-out forwards;
+}
+
+.mk-hero-reinforce p:nth-child(1) {
+  font-weight: 600;
+  animation-delay: 0ms;
+}
+
+.mk-hero-reinforce p:nth-child(2) {
+  font-weight: 500;
+  animation-delay: 120ms;
+}
+
+.mk-hero-reinforce p:nth-child(3) {
+  font-weight: 500;
+  animation-delay: 240ms;
+}
+
+@keyframes mk-reinforce-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Waitlist: dark glassmorphism (frosted card), bento-style soft corners */
 .mk-waitlist {
-  margin-top: 12px;
-  padding: 14px 14px 16px;
-  border-radius: var(--mk-radius-lg);
-  border: 1px solid var(--mk-border-subtle);
-  background: radial-gradient(
-    circle at top left,
-    #020617,
-    #020617 60%,
-    #020416
-  );
-  box-shadow: var(--mk-shadow-soft);
+  margin-top: 14px;
+  padding: 20px 20px 22px;
+  border-radius: var(--mk-radius-card);
+  border: 1px solid var(--mk-glass-border);
+  background: rgba(11, 15, 31, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .mk-waitlist-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.1em;
   color: var(--mk-fg-subtle);
 }
 
 .mk-waitlist-row {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
 }
 
 .mk-input {
   flex: 1;
   min-width: 0;
-  border-radius: var(--mk-radius-pill);
-  border: 1px solid rgba(148, 163, 184, 0.45);
-  background: rgba(15, 23, 42, 0.8);
+  border-radius: var(--mk-radius-sm);
+  border: 1px solid var(--mk-glass-border);
+  background: rgba(5, 7, 18, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--mk-fg);
-  padding: 10px 14px;
+  padding: 12px 16px;
   font-size: 0.92rem;
   outline: none;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease,
-    background-color 0.15s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .mk-input::placeholder {
-  color: rgba(148, 163, 184, 0.7);
+  color: var(--mk-fg-subtle);
+}
+
+.mk-input:hover {
+  border-color: rgba(148, 163, 184, 0.25);
 }
 
 .mk-input:focus-visible {
   border-color: var(--mk-accent);
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.8);
-  background: rgba(15, 23, 42, 0.9);
+  box-shadow: 0 0 0 2px var(--mk-accent-soft);
+  background: rgba(5, 7, 18, 0.7);
 }
 
+/* Outline/ghost primary: light at rest, fills on hover (common in product UIs) */
 .mk-button-primary {
-  border-radius: var(--mk-radius-pill);
-  border: none;
-  padding: 10px 18px;
+  border-radius: var(--mk-radius-sm);
+  border: 1.5px solid rgba(56, 189, 248, 0.5);
+  padding: 12px 22px;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  background: linear-gradient(135deg, #0ea5e9, #22c55e);
-  color: #020617;
+  background: rgba(56, 189, 248, 0.08);
+  color: var(--mk-accent);
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.7);
-  transition:
-    transform 0.1s ease,
-    box-shadow 0.1s ease,
-    filter 0.1s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .mk-button-primary:hover {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.85);
+  background: var(--mk-accent);
+  border-color: var(--mk-accent);
+  color: var(--mk-bg);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.2);
 }
 
 .mk-button-primary:active {
-  transform: translateY(0);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.7);
+  background: #0ea5e9;
+  border-color: #0ea5e9;
+  color: var(--mk-bg);
+  box-shadow: none;
 }
 
 .mk-waitlist-note {
@@ -255,8 +296,8 @@ body.mk-body {
 }
 #sib-form-container .sib-form-message-panel {
   margin-top: 8px;
-  padding: 10px 12px;
-  border-radius: var(--mk-radius-lg);
+  padding: 12px 14px;
+  border-radius: var(--mk-radius-card);
   font-size: 0.8rem;
 }
 #sib-form-container .sib-form-message-panel svg {
