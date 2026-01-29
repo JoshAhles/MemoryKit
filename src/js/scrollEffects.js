@@ -1,10 +1,11 @@
 export function initScrollEffects() {
   const hero = document.querySelector(".mk-hero");
-  const visual = document.querySelector(".mk-hero-visual");
+  const visual = document.querySelector(".mk-brain-visual");
 
   if (!hero || !(visual instanceof HTMLElement)) return;
 
-  const handleScroll = () => {
+  let rafId = null;
+  const update = () => {
     const rect = hero.getBoundingClientRect();
     const vh = window.innerHeight || 1;
     const center = rect.top + rect.height / 2;
@@ -14,15 +15,14 @@ export function initScrollEffects() {
 
     visual.style.transform = `scale(${1 + intensity * 0.03})`;
     visual.style.opacity = String(0.8 + intensity * 0.2);
-
-    if (intensity > 0.4) {
-      visual.classList.add("mk-brain-pulse");
-    } else {
-      visual.classList.remove("mk-brain-pulse");
-    }
+    visual.classList.toggle("mk-brain-pulse", intensity > 0.4);
+    rafId = null;
   };
 
-  handleScroll();
-  window.addEventListener("scroll", handleScroll, { passive: true });
-}
+  const onScroll = () => {
+    if (rafId == null) rafId = requestAnimationFrame(update);
+  };
 
+  update();
+  window.addEventListener("scroll", onScroll, { passive: true });
+}

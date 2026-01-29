@@ -17,7 +17,7 @@ You can open `index.html` directly in a modern browser, or run a simple static s
 python -m http.server 4173
 ```
 
-Then visit `http://localhost:4173` and open `index.html`.
+Then visit `http://localhost:4173` and open `index.html`. Append `?debug=1` to the URL to enable console perf logs for the brain scene.
 
 ## Deployment to GitHub Pages
 

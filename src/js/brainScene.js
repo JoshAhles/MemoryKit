@@ -1,33 +1,19 @@
-// Three.js brain scene with MRI scan reveal effect
-// Particles revealed slice-by-slice like a brain scan
+// Three.js brain scene with MRI scan reveal effect.
+// Placeholder shows immediately; real OBJ is parsed in a Web Worker to avoid blocking the main thread.
 
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js";
-import { OBJLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/OBJLoader.js";
 
-/** Merge multiple BufferGeometries into one. */
-function mergeBufferGeometries(geometries) {
-  const positions = [];
-  const normals = [];
-  const uvs = [];
-  for (const g of geometries) {
-    const pos = g.attributes.position;
-    const norm = g.attributes.normal;
-    const uv = g.attributes.uv;
-    if (!pos) continue;
-    const count = pos.count;
-    for (let i = 0; i < count; i++) {
-      positions.push(pos.getX(i), pos.getY(i), pos.getZ(i));
-      if (norm) normals.push(norm.getX(i), norm.getY(i), norm.getZ(i));
-      if (uv) uvs.push(uv.getX(i), uv.getY(i));
-    }
-  }
-  const merged = new THREE.BufferGeometry();
-  merged.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  if (normals.length) merged.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
-  if (uvs.length) merged.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
-  return merged;
-}
+const DEBUG = /[?&]debug=1/.test(location.search);
+
+const SCAN_SPEED = 80;
+const SCAN_WIDTH = 15;
+const PARTICLE_STEP = 8;
+const PLACEHOLDER_RADIUS = 70;
+const PLACEHOLDER_DETAIL = 2;
+const PLACEHOLDER_DECIMATE = 2;
+const POINT_SIZE_BASE = 2.2;
+const POINT_SIZE_REF_DIST = 300;
 
 /** Take every step-th vertex for a lighter points cloud. */
 function decimateForPoints(geometry, step) {
@@ -44,7 +30,9 @@ function decimateForPoints(geometry, step) {
 }
 
 // Custom shader for scan reveal effect (bottom to top, reveal behind scan)
+// Explicit highp helps Cursor/Electron WebGL match Chrome (avoids mediump blur/size quirks)
 const scanVertexShader = `
+  precision highp float;
   uniform float uScanY;
   uniform float uScanWidth;
   varying float vVisible;
@@ -53,7 +41,7 @@ const scanVertexShader = `
   void main() {
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mvPosition;
-    gl_PointSize = 2.2 * (300.0 / -mvPosition.z);
+    gl_PointSize = 2.2 * (300.0 / -mvPosition.z); /* POINT_SIZE_BASE * (REF_DIST / depth) */
     
     // Particles visible BELOW the scan line (revealed after scan passes)
     vVisible = step(position.y, uScanY);
@@ -65,6 +53,7 @@ const scanVertexShader = `
 `;
 
 const scanFragmentShader = `
+  precision highp float;
   uniform vec3 uColor;
   uniform vec3 uScanColor;
   uniform float uOpacity;
@@ -117,35 +106,50 @@ function createCurvedPath(start, end, segments = 20) {
   return points;
 }
 
+function logPerf(label, startMs) {
+  if (!DEBUG) return;
+  const elapsed = (performance.now() - startMs).toFixed(1);
+  console.log(`[brain] ⏱ ${label}: ${elapsed}ms`);
+}
+
 export function initBrainScene(canvas) {
+  const t0 = performance.now();
+  if (DEBUG) console.log("[brain] initBrainScene() start", document.activeElement?.id || document.activeElement?.tagName);
+
+  let t = performance.now();
   const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: true,
     alpha: true,
+    premultipliedAlpha: false,
     powerPreference: "high-performance",
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setClearColor(0x000000, 0);
+  canvas.style.pointerEvents = "none"; // keep page clickable; brain is visual only
+  logPerf("renderer create", t);
 
+  t = performance.now();
   const scene = new THREE.Scene();
   scene.background = null;
   scene.fog = new THREE.Fog(0x020617, 400, 1500);
-
-  const w = Math.max(canvas.clientWidth || 1, 1);
-  const h = Math.max(canvas.clientHeight || 1, 1);
+  const container = canvas.parentElement;
+  const w = Math.max(canvas.clientWidth || container?.clientWidth || 1, 1);
+  const h = Math.max(canvas.clientHeight || container?.clientHeight || 1, 1);
   const camera = new THREE.PerspectiveCamera(54, w / h, 1, 2000);
   camera.position.set(0, 0, 380);
-
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.enableZoom = false;
-  controls.autoRotate = false; // Disable during scan
+  controls.autoRotate = false;
   controls.autoRotateSpeed = 0.3;
   controls.minDistance = 200;
   controls.maxDistance = 700;
   controls.minPolarAngle = Math.PI / 3;
   controls.maxPolarAngle = (2 * Math.PI) / 3;
+  controls.keys = {};
+  logPerf("scene/camera/controls", t);
 
   // Lighting
   const ambientLight = new THREE.AmbientLight(0xb8c5cf, 0.3);
@@ -167,6 +171,7 @@ export function initBrainScene(canvas) {
   brainGroup.add(pathwaysGroup);
 
   // Create thinking pathway lines
+  t = performance.now();
   const pathways = [];
   const pathwayConnections = [
     [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0],
@@ -194,8 +199,10 @@ export function initBrainScene(canvas) {
       duration: 1.5,
     });
   });
+  logPerf("pathways loop", t);
 
   // Flashing nodes
+  t = performance.now();
   const nodeGeometry = new THREE.BufferGeometry();
   const nodePositions = new Float32Array(BRAIN_REGIONS.length * 3);
   BRAIN_REGIONS.forEach((region, i) => {
@@ -215,103 +222,111 @@ export function initBrainScene(canvas) {
   });
   const nodes = new THREE.Points(nodeGeometry, nodeMaterial);
   pathwaysGroup.add(nodes);
+  logPerf("nodes", t);
+  logPerf("initBrainScene sync total", t0);
 
   // State for scan animation (bottom to top)
   let scanState = {
-    phase: "scanning", // "scanning", "complete"
-    scanY: -120, // Start below the brain
-    scanSpeed: 80, // units per second
-    maxY: 120, // End above the brain
+    phase: "scanning",
+    scanY: -120,
+    scanSpeed: SCAN_SPEED,
+    maxY: 120,
     startTime: performance.now(),
   };
 
-  // Store refs for materials
+  // Store refs for materials (used by render loop for uScanY)
   let brainPointsMaterial = null;
 
-  const objLoader = new OBJLoader();
-  objLoader.load(
-    "third_party/3dbrain/static/models/BrainUVs.obj",
-    (obj) => {
-      const geometries = [];
-      obj.traverse((child) => {
-        if (child.isMesh && child.geometry) {
-          geometries.push(child.geometry);
-        }
-      });
-      if (geometries.length === 0) return;
-
-      const mergedGeo = mergeBufferGeometries(geometries);
-      if (!mergedGeo) return;
-
-      mergedGeo.computeVertexNormals();
-      mergedGeo.computeBoundingBox();
-      
-      // Get brain bounds for scan animation (bottom to top)
-      const bbox = mergedGeo.boundingBox;
-      scanState.scanY = bbox.min.y - 10; // Start below
-      scanState.maxY = bbox.max.y + 10; // End above
-
-      // Particle layer with custom scan shader
-      const PARTICLE_STEP = 8;
-      const particleGeo = decimateForPoints(mergedGeo, PARTICLE_STEP);
-      
-      brainPointsMaterial = new THREE.ShaderMaterial({
-        uniforms: {
-          uScanY: { value: scanState.scanY },
-          uScanWidth: { value: 15.0 },
-          uColor: { value: new THREE.Color(0xdde3e9) },
-          uScanColor: { value: new THREE.Color(0x38bdf8) },
-          uOpacity: { value: 0.85 },
-        },
-        vertexShader: scanVertexShader,
-        fragmentShader: scanFragmentShader,
-        transparent: true,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      });
-      
-      const brainPoints = new THREE.Points(particleGeo, brainPointsMaterial);
-      brainPoints.frustumCulled = false;
-      brainGroup.add(brainPoints);
-
-      // X-ray shell (hidden during scan, fades in after)
-      const xRayMat = new THREE.MeshBasicMaterial({
-        color: 0x84ccff,
-        transparent: true,
-        opacity: 0,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        side: THREE.BackSide,
-      });
-      const xRayGeo = mergedGeo.clone();
-      const xRayMesh = new THREE.Mesh(xRayGeo, xRayMat);
-      xRayMesh.scale.setScalar(1.03);
-      brainGroup.add(xRayMesh);
-      
-      // Store reference for later
-      scene.userData.xRayMat = xRayMat;
-
-      brainGroup.rotation.y = Math.PI / 2;
+  // --- Placeholder: show a brain-like shape and start render loop immediately ---
+  const placeholderGeo = new THREE.IcosahedronGeometry(PLACEHOLDER_RADIUS, PLACEHOLDER_DETAIL);
+  const placeholderPointsGeo = decimateForPoints(placeholderGeo, PLACEHOLDER_DECIMATE);
+  placeholderGeo.dispose();
+  brainPointsMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+      uScanY: { value: scanState.scanY },
+      uScanWidth: { value: SCAN_WIDTH },
+      uColor: { value: new THREE.Color(0xdde3e9) },
+      uScanColor: { value: new THREE.Color(0x38bdf8) },
+      uOpacity: { value: 0.85 },
     },
-    undefined,
-    () => {
-      // OBJ load error - show simple fallback
-      const geo = new THREE.IcosahedronGeometry(80, 3);
-      const mat = new THREE.MeshStandardMaterial({
-        color: 0x020617,
-        emissive: new THREE.Color(0x38bdf8),
-        emissiveIntensity: 0.35,
-      });
-      const mesh = new THREE.Mesh(geo, mat);
-      brainGroup.add(mesh);
-      brainGroup.rotation.y = Math.PI / 2;
-      scanState.phase = "complete";
-    }
-  );
+    vertexShader: scanVertexShader,
+    fragmentShader: scanFragmentShader,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+  const placeholderPoints = new THREE.Points(placeholderPointsGeo, brainPointsMaterial);
+  placeholderPoints.frustumCulled = false;
+  brainGroup.add(placeholderPoints);
+  brainGroup.rotation.y = Math.PI / 2;
+  scene.userData.placeholderBrain = placeholderPoints;
+  if (DEBUG) console.log("[brain] placeholder visible, render loop starting", `${(performance.now() - t0).toFixed(0)}ms`);
+  requestAnimationFrame(render);
+
+  // --- Load real brain in worker (non-blocking) ---
+  const OBJ_URL = "third_party/models/BrainUVs.obj";
+  fetch(OBJ_URL)
+    .then((res) => {
+      if (!res.ok) throw new Error(`OBJ fetch ${res.status}`);
+      return res.text();
+    })
+    .then((text) => {
+      const tFetched = performance.now();
+      if (DEBUG) console.log("[brain] OBJ fetched, parsing in worker", `${(tFetched - t0).toFixed(0)}ms`);
+      const worker = new Worker(new URL("./objParser.worker.js", import.meta.url));
+      worker.onmessage = (e) => {
+        const { error, positions, normals } = e.data;
+        worker.terminate();
+        if (error || !positions || !normals) {
+          console.warn("[brain] worker error or empty result", error);
+          return;
+        }
+        const tBuild = performance.now();
+        const mergedGeo = new THREE.BufferGeometry();
+        mergedGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        mergedGeo.setAttribute("normal", new THREE.BufferAttribute(normals, 3));
+        mergedGeo.computeVertexNormals();
+        mergedGeo.computeBoundingBox();
+        const bbox = mergedGeo.boundingBox;
+        scanState.scanY = bbox.min.y - 10;
+        scanState.maxY = bbox.max.y + 10;
+        const particleGeo = decimateForPoints(mergedGeo, PARTICLE_STEP);
+        brainPointsMaterial.uniforms.uScanY.value = scanState.scanY;
+        const brainPoints = new THREE.Points(particleGeo, brainPointsMaterial);
+        brainPoints.frustumCulled = false;
+        brainGroup.remove(placeholderPoints);
+        placeholderPointsGeo.dispose();
+        brainGroup.add(brainPoints);
+        const xRayMat = new THREE.MeshBasicMaterial({
+          color: 0x84ccff,
+          transparent: true,
+          opacity: 0,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          side: THREE.BackSide,
+        });
+        const xRayGeo = mergedGeo.clone();
+        const xRayMesh = new THREE.Mesh(xRayGeo, xRayMat);
+        xRayMesh.scale.setScalar(1.03);
+        brainGroup.add(xRayMesh);
+        scene.userData.xRayMat = xRayMat;
+        mergedGeo.dispose();
+        if (DEBUG) console.log("[brain] real brain visible", `${(performance.now() - t0).toFixed(0)}ms`, `build: ${(performance.now() - tBuild).toFixed(0)}ms`);
+      };
+      worker.onerror = () => {
+        worker.terminate();
+        if (DEBUG) console.warn("[brain] worker error, keeping placeholder");
+      };
+      worker.postMessage(text);
+    })
+    .catch((err) => {
+      if (DEBUG) console.warn("[brain] OBJ fetch error, keeping placeholder", err);
+    });
 
   function resizeRendererToDisplaySize() {
-    const width = Math.max(canvas.clientWidth || 0, 1);
-    const height = Math.max(canvas.clientHeight || 0, 1);
+    const parent = canvas.parentElement;
+    const width = Math.max(canvas.clientWidth || parent?.clientWidth || 0, 1);
+    const height = Math.max(canvas.clientHeight || parent?.clientHeight || 0, 1);
     const needResize = canvas.width !== width || canvas.height !== height;
     if (needResize) {
       renderer.setSize(width, height, false);
@@ -323,9 +338,17 @@ export function initBrainScene(canvas) {
   let lastTime = performance.now();
   let cycleTime = 0;
   const cycleDuration = 8;
+  let firstRenderLogged = false;
+  let frameCount = 0;
+  let lastLogTime = performance.now();
 
   function render(now) {
-    now = now || performance.now();
+    const frameStart = performance.now();
+    if (DEBUG && !firstRenderLogged) {
+      console.log("[brain] first render frame", `${(frameStart - t0).toFixed(0)}ms`);
+      firstRenderLogged = true;
+    }
+    now = now || frameStart;
     const dt = (now - lastTime) / 1000;
     lastTime = now;
 
@@ -336,7 +359,7 @@ export function initBrainScene(canvas) {
 
     // Scan animation (bottom to top)
     if (scanState.phase === "scanning") {
-      scanState.scanY += scanState.scanSpeed * dt; // Moving upward
+      scanState.scanY += scanState.scanSpeed * dt;
       
       // Update scan line position
       scanLine.position.y = scanState.scanY;
@@ -353,6 +376,7 @@ export function initBrainScene(canvas) {
         scanLine.visible = false;
         controls.autoRotate = true;
         pathwaysGroup.visible = true;
+        if (DEBUG) console.log("[brain] scan complete", `${(performance.now() - t0).toFixed(0)}ms`);
         
         // Fade in x-ray shell
         if (scene.userData.xRayMat) {
@@ -386,8 +410,18 @@ export function initBrainScene(canvas) {
     }
 
     renderer.render(scene, camera);
+    frameCount++;
+    if (DEBUG) {
+      const frameMs = performance.now() - frameStart;
+      if (frameMs > 50) console.log("[brain] ⚠️ long frame", frameMs.toFixed(1), "ms");
+      if (frameCount > 0 && frameCount % 120 === 0) {
+        const elapsed = (performance.now() - lastLogTime) / 1000;
+        console.log("[brain] 120 frames in", elapsed.toFixed(2), "s (~", (120 / elapsed).toFixed(1), "fps)");
+        lastLogTime = performance.now();
+      }
+    }
     requestAnimationFrame(render);
   }
 
-  requestAnimationFrame(render);
+  if (DEBUG) console.log("[brain] initBrainScene returned", `${(performance.now() - t0).toFixed(0)}ms`);
 }

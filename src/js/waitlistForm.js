@@ -1,32 +1,41 @@
 function isValidEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).toLowerCase());
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).toLowerCase().trim());
 }
 
-export function initWaitlistForm({ form, messageElement, emailInput }) {
+/**
+ * Wires validation and UI feedback for the waitlist form.
+ * Invalid: preventDefault + show error. Valid: show "Signing up…", hide form row/note, let Brevo handle submit.
+ * @param {Object} opts
+ * @param {HTMLFormElement} opts.form
+ * @param {HTMLElement} opts.messageElement - e.g. mk-waitlist-confirm
+ * @param {HTMLInputElement} opts.emailInput
+ * @param {HTMLElement|null} [opts.formRow] - optional; hidden when showing "Signing up…"
+ * @param {HTMLElement|null} [opts.noteElement] - optional; hidden when showing "Signing up…"
+ */
+export function initWaitlistForm({ form, messageElement, emailInput, formRow = null, noteElement = null }) {
   form.addEventListener("submit", (event) => {
-    event.preventDefault();
-
     const email = emailInput.value.trim();
     messageElement.textContent = "";
-    messageElement.classList.remove(
-      "mk-waitlist-message--error",
-      "mk-waitlist-message--success"
-    );
+    messageElement.classList.remove("mk-waitlist-message--error", "mk-waitlist-message--success");
     emailInput.classList.remove("mk-input--error");
 
     if (!isValidEmail(email)) {
+      event.preventDefault();
       emailInput.classList.add("mk-input--error");
-      messageElement.textContent = "Add a valid email to join the waitlist.";
+      messageElement.textContent = "Please enter a valid email address.";
       messageElement.classList.add("mk-waitlist-message--error");
+      messageElement.style.display = "block";
+      if (formRow) formRow.style.display = "";
+      if (noteElement) noteElement.style.display = "";
       return;
     }
 
-    // Placeholder: in production, wire this up to your waitlist backend or provider.
-    // Keeping everything on the client for now to match the static-site constraint.
-    form.reset();
-    messageElement.textContent =
-      "You’re on the list. We’ll reach out when MemoryKit is ready.";
+    messageElement.textContent = "Signing up…";
     messageElement.classList.add("mk-waitlist-message--success");
+    messageElement.style.display = "block";
+    if (formRow) formRow.style.display = "none";
+    if (noteElement) noteElement.style.display = "none";
+    // Do not preventDefault: Brevo's script handles submission; MutationObserver in index.html shows final success/error.
   });
 }
 

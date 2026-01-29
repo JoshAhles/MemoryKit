@@ -9,8 +9,9 @@
   --mk-radius-lg: 18px;
   --mk-radius-pill: 999px;
   --mk-shadow-soft: 0 24px 80px rgba(15, 23, 42, 0.7);
-  --mk-font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Inter", "Segoe UI", sans-serif;
+  --mk-font-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter",
+    "Segoe UI", sans-serif;
 }
 
 *,
@@ -27,7 +28,12 @@ body {
 
 body.mk-body {
   min-height: 100vh;
-  background: radial-gradient(circle at top, #020617 0, #020617 40%, #020416 100%);
+  background: radial-gradient(
+    circle at top,
+    #020617 0,
+    #020617 40%,
+    #020416 100%
+  );
   color: var(--mk-fg);
   font-family: var(--mk-font-sans);
   -webkit-font-smoothing: antialiased;
@@ -65,7 +71,12 @@ body.mk-body {
   width: 20px;
   height: 20px;
   border-radius: 40%;
-  background: radial-gradient(circle at 30% 20%, #38bdf8, #6366f1 40%, #020617 80%);
+  background: radial-gradient(
+    circle at 30% 20%,
+    #38bdf8,
+    #6366f1 40%,
+    #020617 80%
+  );
   box-shadow: 0 0 18px rgba(56, 189, 248, 0.8);
 }
 
@@ -126,7 +137,12 @@ body.mk-body {
   padding: 14px 14px 16px;
   border-radius: var(--mk-radius-lg);
   border: 1px solid var(--mk-border-subtle);
-  background: radial-gradient(circle at top left, #020617, #020617 60%, #020416);
+  background: radial-gradient(
+    circle at top left,
+    #020617,
+    #020617 60%,
+    #020416
+  );
   box-shadow: var(--mk-shadow-soft);
   display: flex;
   flex-direction: column;
@@ -156,7 +172,9 @@ body.mk-body {
   padding: 10px 14px;
   font-size: 0.92rem;
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease,
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
     background-color 0.15s ease;
 }
 
@@ -185,7 +203,10 @@ body.mk-body {
   justify-content: center;
   gap: 6px;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.7);
-  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease,
+    filter 0.1s ease;
 }
 
 .mk-button-primary:hover {
@@ -211,16 +232,81 @@ body.mk-body {
   min-height: 1em;
 }
 
-/* Floating brain canvas */
-.mk-brain-canvas.mk-brain-floating {
+/* Brevo form: hide honeypot, keep our card/input/button look */
+#sib-form-container .input--hidden,
+#sib-form-container input[name="email_address_check"] {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  border: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+#sib-container.sib-container--large {
+  background: transparent !important;
+  border: none !important;
+  max-width: none !important;
+  padding: 0 !important;
+}
+#sib-form-container .sib-form-message-panel {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: var(--mk-radius-lg);
+  font-size: 0.8rem;
+}
+#sib-form-container .sib-form-message-panel svg {
+  display: none;
+}
+#sib-form-container .sib-form-block__button .sib-hide-loader-icon {
+  display: none;
+}
+#sib-form #EMAIL,
+#sib-form input.mk-input {
+  flex: 1;
+  min-width: 0;
+  border-radius: var(--mk-radius-pill);
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(15, 23, 42, 0.8);
+  color: var(--mk-fg);
+  padding: 10px 14px;
+  font-size: 0.92rem;
+  outline: none;
+}
+#sib-form #EMAIL::placeholder,
+#sib-form input.mk-input::placeholder {
+  color: rgba(148, 163, 184, 0.7);
+}
+#sib-form #EMAIL:focus-visible,
+#sib-form input.mk-input:focus-visible {
+  border-color: var(--mk-accent);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.8);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+/* Square frame for the brain — in place, no visible chrome */
+.mk-brain-frame.mk-brain-floating {
   position: absolute;
   top: 50%;
-  right: -20px;
+  left: 520px;
+  right: auto;
+  width: 520px;
+  height: 520px;
   transform: translateY(-50%);
-  width: 550px;
-  height: 550px;
   pointer-events: none;
   z-index: 0;
+  overflow: hidden;
+}
+
+.mk-brain-frame .mk-brain-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
   background: transparent;
 }
 
@@ -232,6 +318,7 @@ body.mk-body {
 .mk-hero-copy {
   position: relative;
   z-index: 2;
+  pointer-events: auto; /* ensure form is clickable even if canvas overlaps */
 }
 
 .mk-footer {
@@ -248,6 +335,7 @@ body.mk-body {
 @media (max-width: 880px) {
   .mk-brain-canvas.mk-brain-floating {
     position: fixed;
+    left: auto;
     top: 50%;
     right: -20%;
     width: 80%;
@@ -276,4 +364,3 @@ body.mk-body {
     justify-content: center;
   }
 }
-

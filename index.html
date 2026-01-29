@@ -56,35 +56,41 @@
             <p>Your AI should adapt to you.</p>
           </div>
 
-          <form class="mk-waitlist" id="mk-waitlist-form" novalidate>
-            <label class="mk-waitlist-label" for="mk-email">
-              Join the early waitlist
-            </label>
-            <div class="mk-waitlist-row">
-              <input
-                id="mk-email"
-                name="email"
-                type="email"
-                inputmode="email"
-                autocomplete="email"
-                required
-                placeholder="you@company.com"
-                class="mk-input"
-                aria-describedby="mk-waitlist-note"
-              />
-              <button type="submit" class="mk-button-primary">
-                Join waitlist
-              </button>
+          <!-- Brevo waitlist form (submits to your Brevo list) -->
+          <div class="mk-waitlist sib-form" id="sib-form-container">
+            <div id="error-message" class="sib-form-message-panel mk-waitlist-message mk-waitlist-message--error" style="display: none;">
+              <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                <span class="sib-form-message-panel__inner-text">Your subscription could not be saved. Please try again.</span>
+              </div>
             </div>
-            <p id="mk-waitlist-note" class="mk-waitlist-note">
-              No spam. We’ll email only when there’s something real to try.
-            </p>
-            <p class="mk-waitlist-message" id="mk-waitlist-message" role="status" aria-live="polite"></p>
-          </form>
+            <div id="success-message" class="sib-form-message-panel mk-waitlist-message mk-waitlist-message--success" style="display: none;">
+              <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                <span class="sib-form-message-panel__inner-text">Your subscription has been successful.</span>
+              </div>
+            </div>
+            <label class="mk-waitlist-label" for="EMAIL">Join the early waitlist</label>
+            <div id="sib-container" class="sib-container--large sib-container--vertical">
+              <form id="sib-form" method="POST" action="https://2b8ceb88.sibforms.com/serve/MUIFAAHCKo-IjyqjBMqnm9_gZRGEYhYaivW_UZwYaOVJW94rrpSwgZ84OUvvkXZR1D6mwiruG8bvj9OvOboHNPtbKTNlkPxZPJgnkl-SizdBfmsKnIF0AJMFlUIDAnKnVCWllEnM9BJNkWC7NOKBuRJmSxH8qsFQQe2-_VEN5cfB4FDOyHVKi7VowNl3k-0MHIQaxIIdMs7g96j5NQ==" data-type="subscription">
+                <div class="mk-waitlist-row">
+                  <input class="mk-input input" type="email" id="EMAIL" name="EMAIL" autocomplete="off" placeholder="you@company.com" required data-required="true" aria-describedby="mk-waitlist-note" />
+                  <button class="mk-button-primary sib-form-block__button sib-form-block__button-with-loader" type="submit">
+                    <svg class="icon clickable__icon progress-indicator__icon sib-hide-loader-icon" viewBox="0 0 512 512" aria-hidden="true"><path d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" /></svg>
+                    Join waitlist
+                  </button>
+                </div>
+                <input type="text" name="email_address_check" value="" class="input--hidden" aria-hidden="true" tabindex="-1" />
+                <input type="hidden" name="locale" value="en" />
+              </form>
+            </div>
+            <p id="mk-waitlist-note" class="mk-waitlist-note">No spam. We’ll email only when there’s something real to try.</p>
+            <p id="mk-waitlist-confirm" class="mk-waitlist-message mk-waitlist-message--success" role="status" aria-live="polite" style="display: none;"></p>
+          </div>
         </div>
 
-        <!-- Brain canvas floats freely -->
-        <canvas id="mk-brain-canvas" class="mk-brain-canvas mk-brain-floating" aria-hidden="true"></canvas>
+        <!-- Brain in a square frame: canvas fills the frame; outline keeps it clearly in place -->
+        <div class="mk-brain-frame mk-brain-floating" aria-hidden="true">
+          <canvas id="mk-brain-canvas" class="mk-brain-canvas" aria-hidden="true"></canvas>
+        </div>
       </section>
 
       <footer class="mk-footer">
@@ -94,6 +100,51 @@
     </main>
 
     <script type="module" src="src/js/main.js"></script>
+    <!-- Brevo form: must load so submissions reach your list -->
+    <script>
+      window.REQUIRED_CODE_ERROR_MESSAGE = 'Please choose a country code';
+      window.LOCALE = 'en';
+      window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE = "The information provided is invalid. Please review the field format and try again.";
+      window.REQUIRED_ERROR_MESSAGE = "This field cannot be left blank.";
+      window.GENERIC_INVALID_MESSAGE = "The information provided is invalid. Please review the field format and try again.";
+      window.translation = { common: { selectedList: '{quantity} list selected', selectedLists: '{quantity} lists selected', selectedOption: '{quantity} selected', selectedOptions: '{quantity} selected' } };
+      var AUTOHIDE = Boolean(0);
+    </script>
+    <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
+    <script>
+      (function() {
+        var confirmEl = document.getElementById('mk-waitlist-confirm');
+        var successEl = document.getElementById('success-message');
+        var errorEl = document.getElementById('error-message');
+        var formRow = document.querySelector('#sib-form .mk-waitlist-row');
+        var noteEl = document.getElementById('mk-waitlist-note');
+
+        function showConfirm(msg) {
+          if (!confirmEl) return;
+          confirmEl.className = 'mk-waitlist-message mk-waitlist-message--success';
+          confirmEl.textContent = msg || "You're on the list. We'll email you when there's something real to try.";
+          confirmEl.style.display = 'block';
+          if (formRow) formRow.style.display = 'none';
+          if (noteEl) noteEl.style.display = 'none';
+        }
+
+        function showError(msg) {
+          if (!confirmEl) return;
+          confirmEl.className = 'mk-waitlist-message mk-waitlist-message--error';
+          confirmEl.textContent = msg || 'Something went wrong. Please try again.';
+          confirmEl.style.display = 'block';
+          if (formRow) formRow.style.display = '';
+          if (noteEl) noteEl.style.display = '';
+        }
+
+        var observer = new MutationObserver(function() {
+          if (successEl && successEl.style.display === 'block') showConfirm();
+          if (errorEl && errorEl.style.display === 'block') showError(errorEl.innerText || 'Please try again.');
+        });
+        if (successEl) observer.observe(successEl, { attributes: true, attributeFilter: ['style'] });
+        if (errorEl) observer.observe(errorEl, { attributes: true, attributeFilter: ['style'] });
+      })();
+    </script>
   </body>
 </html>
 
