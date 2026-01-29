@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MemoryKit — Persistent Memory for AI</title>
+    <meta
+      name="description"
+      content="MemoryKit is a persistent, user-owned memory layer for AI — a canonical source of truth for your long-term context that travels with you across models."
+    />
+    <meta name="robots" content="index,follow" />
+    <meta property="og:title" content="MemoryKit — Persistent Memory for AI" />
+    <meta
+      property="og:description"
+      content="Define your memory once. Use it everywhere. MemoryKit is a structured, portable memory bank for your AI tools."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://memorykit.ai" />
+    <meta property="og:image" content="assets/og-image.png" />
+    <meta name="theme-color" content="#050712" />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="src/styles/base.css" />
+    <link rel="stylesheet" href="src/styles/theme.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/": "https://unpkg.com/three@0.160.0/"
+        }
+      }
+    </script>
+  </head>
+  <body class="mk-body">
+    <main class="mk-page">
+      <header class="mk-header">
+        <div class="mk-logo">
+          <span class="mk-logo-mark"></span>
+          <span class="mk-logo-text">MemoryKit</span>
+        </div>
+        <span class="mk-header-pill">Early concept · Infrastructure, not chat</span>
+      </header>
+
+      <section class="mk-hero" aria-labelledby="mk-hero-title">
+        <div class="mk-hero-copy">
+          <h1 id="mk-hero-title" class="mk-hero-title">
+            A persistent memory layer<br />
+            for your AI tools.
+          </h1>
+          <p class="mk-hero-subtitle">
+            MemoryKit is a user-owned memory bank for your expertise, preferences, and ongoing work —
+            portable across LLMs, models, and tools.
+          </p>
+
+          <div class="mk-hero-reinforce">
+            <p>Memory should persist.</p>
+            <p>You should own it.</p>
+            <p>Your AI should adapt to you.</p>
+          </div>
+
+          <form class="mk-waitlist" id="mk-waitlist-form" novalidate>
+            <label class="mk-waitlist-label" for="mk-email">
+              Join the early waitlist
+            </label>
+            <div class="mk-waitlist-row">
+              <input
+                id="mk-email"
+                name="email"
+                type="email"
+                inputmode="email"
+                autocomplete="email"
+                required
+                placeholder="you@company.com"
+                class="mk-input"
+                aria-describedby="mk-waitlist-note"
+              />
+              <button type="submit" class="mk-button-primary">
+                Join waitlist
+              </button>
+            </div>
+            <p id="mk-waitlist-note" class="mk-waitlist-note">
+              No spam. We’ll email only when there’s something real to try.
+            </p>
+            <p class="mk-waitlist-message" id="mk-waitlist-message" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <!-- Brain canvas floats freely -->
+        <canvas id="mk-brain-canvas" class="mk-brain-canvas mk-brain-floating" aria-hidden="true"></canvas>
+      </section>
+
+      <footer class="mk-footer">
+        <span>memorykit.ai</span>
+        <span>Built for people who think in systems.</span>
+      </footer>
+    </main>
+
+    <script type="module" src="src/js/main.js"></script>
+  </body>
+</html>
+

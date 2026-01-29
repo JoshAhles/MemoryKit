@@ -1,0 +1,31 @@
+.mk-body {
+  color-scheme: dark;
+}
+
+.mk-waitlist-message--error {
+  color: #f97373;
+}
+
+.mk-waitlist-message--success {
+  color: #4ade80;
+}
+
+.mk-input--error {
+  border-color: #f97373 !important;
+}
+
+.mk-brain-pulse {
+  box-shadow: 0 0 40px var(--mk-accent-soft);
+}
+
+.mk-brain-fps {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--mk-fg-subtle);
+  pointer-events: none;
+  z-index: 2;
+}
+
