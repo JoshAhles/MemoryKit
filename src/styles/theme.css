@@ -1,0 +1,16 @@
+.mk-body {
+  color-scheme: dark;
+}
+
+.mk-waitlist-message--error {
+  color: #f97373;
+}
+
+.mk-waitlist-message--success {
+  color: #4ade80;
+}
+
+.mk-input--error {
+  border-color: #f97373 !important;
+}
+

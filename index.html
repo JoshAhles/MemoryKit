@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MemoryKit</title>
+    <meta
+      name="description"
+      content="MemoryKit is a persistent, user-owned memory layer for AI — a canonical source of truth for your long-term context that travels with you across models."
+    />
+    <meta name="robots" content="index,follow" />
+    <meta property="og:title" content="MemoryKit — Persistent Memory for AI" />
+    <meta
+      property="og:description"
+      content="Define your memory once. Use it everywhere. MemoryKit is a structured, portable memory bank for your AI tools."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://memorykit.ai" />
+    <meta property="og:image" content="assets/og_image.png" />
+    <meta name="theme-color" content="#050712" />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="src/styles/base.css" />
+    <link rel="stylesheet" href="src/styles/theme.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/": "https://unpkg.com/three@0.160.0/"
+        }
+      }
+    </script>
+  </head>
+  <body class="mk-body">
+    <main class="mk-page">
+      <header class="mk-header">
+        <div class="mk-logo">
+          <span class="mk-logo-mark" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M9 13a4.5 4.5 0 0 0 3-4"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M12 13h4"/><path d="M12 18h6a2 2 0 0 1 2 2v1"/><path d="M12 8h8"/><path d="M16 8V5a2 2 0 0 1 2-2"/><circle cx="16" cy="13" r=".5"/><circle cx="18" cy="3" r=".5"/><circle cx="20" cy="21" r=".5"/><circle cx="20" cy="8" r=".5"/></svg>
+          </span>
+          <span class="mk-logo-text">MemoryKit</span>
+        </div>
+      </header>
+
+      <section class="mk-hero" aria-labelledby="mk-hero-title">
+        <div class="mk-hero-copy">
+          <h1 id="mk-hero-title" class="mk-hero-title">
+            A persistent memory<br />
+            layer for your AI tools.
+          </h1>
+          <p class="mk-hero-subtitle">
+            MemoryKit is a user-owned memory bank for your expertise, preferences, and ongoing work —
+            portable across LLMs, models, and tools.
+          </p>
+
+          <div class="mk-hero-reinforce">
+            <p>Memory should persist.</p>
+            <p>You should own it.</p>
+            <p>Your AI should adapt to you.</p>
+          </div>
+
+          <!-- Brevo waitlist form (submits to your Brevo list) -->
+          <div class="mk-waitlist sib-form" id="sib-form-container">
+            <div id="error-message" class="sib-form-message-panel mk-waitlist-message mk-waitlist-message--error" style="display: none;">
+              <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                <span class="sib-form-message-panel__inner-text">Your subscription could not be saved. Please try again.</span>
+              </div>
+            </div>
+            <div id="success-message" class="sib-form-message-panel mk-waitlist-message mk-waitlist-message--success" style="display: none;">
+              <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                <span class="sib-form-message-panel__inner-text">Your subscription has been successful.</span>
+              </div>
+            </div>
+            <label class="mk-waitlist-label" for="EMAIL">Join the early waitlist</label>
+            <div id="sib-container" class="sib-container--large sib-container--vertical">
+              <form id="sib-form" method="POST" action="https://2b8ceb88.sibforms.com/serve/MUIFAAHCKo-IjyqjBMqnm9_gZRGEYhYaivW_UZwYaOVJW94rrpSwgZ84OUvvkXZR1D6mwiruG8bvj9OvOboHNPtbKTNlkPxZPJgnkl-SizdBfmsKnIF0AJMFlUIDAnKnVCWllEnM9BJNkWC7NOKBuRJmSxH8qsFQQe2-_VEN5cfB4FDOyHVKi7VowNl3k-0MHIQaxIIdMs7g96j5NQ==" data-type="subscription">
+                <div class="mk-waitlist-row">
+                  <input class="mk-input input" type="email" id="EMAIL" name="EMAIL" autocomplete="off" placeholder="you@email.com" required data-required="true" aria-describedby="mk-waitlist-note" />
+                  <button class="mk-button-primary sib-form-block__button sib-form-block__button-with-loader" type="submit">
+                    <svg class="icon clickable__icon progress-indicator__icon sib-hide-loader-icon" viewBox="0 0 512 512" aria-hidden="true"><path d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" /></svg>
+                    Join waitlist
+                  </button>
+                </div>
+                <input type="text" name="email_address_check" value="" class="input--hidden" aria-hidden="true" tabindex="-1" />
+                <input type="hidden" name="locale" value="en" />
+              </form>
+            </div>
+            <p id="mk-waitlist-note" class="mk-waitlist-note">No spam. Only meaningful updates.</p>
+            <p id="mk-waitlist-confirm" class="mk-waitlist-message mk-waitlist-message--success" role="status" aria-live="polite" style="display: none;"></p>
+          </div>
+        </div>
+
+        <!-- Brain in a square frame: canvas fills the frame; outline keeps it clearly in place -->
+        <div class="mk-brain-frame mk-brain-floating" aria-hidden="true">
+          <canvas id="mk-brain-canvas" class="mk-brain-canvas" aria-hidden="true"></canvas>
+        </div>
+      </section>
+
+      <footer class="mk-footer">
+        <span>memorykit.ai</span>
+        <span>Built for people who think in systems.</span>
+      </footer>
+    </main>
+
+    <script type="module" src="src/js/main.js"></script>
+    <!-- Brevo form: must load so submissions reach your list -->
+    <script>
+      window.REQUIRED_CODE_ERROR_MESSAGE = 'Please choose a country code';
+      window.LOCALE = 'en';
+      window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE = "The information provided is invalid. Please review the field format and try again.";
+      window.REQUIRED_ERROR_MESSAGE = "This field cannot be left blank.";
+      window.GENERIC_INVALID_MESSAGE = "The information provided is invalid. Please review the field format and try again.";
+      window.translation = { common: { selectedList: '{quantity} list selected', selectedLists: '{quantity} lists selected', selectedOption: '{quantity} selected', selectedOptions: '{quantity} selected' } };
+      var AUTOHIDE = Boolean(0);
+    </script>
+    <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
+    <script>
+      (function() {
+        var confirmEl = document.getElementById('mk-waitlist-confirm');
+        var successEl = document.getElementById('success-message');
+        var errorEl = document.getElementById('error-message');
+        var formRow = document.querySelector('#sib-form .mk-waitlist-row');
+        var noteEl = document.getElementById('mk-waitlist-note');
+
+        function showConfirm(msg) {
+          if (!confirmEl) return;
+          confirmEl.className = 'mk-waitlist-message mk-waitlist-message--success';
+          confirmEl.textContent = msg || "You're on the list. We'll only email when there's something meaningful.";
+          confirmEl.style.display = 'block';
+          if (formRow) formRow.style.display = 'none';
+          if (noteEl) noteEl.style.display = 'none';
+        }
+
+        function showError(msg) {
+          if (!confirmEl) return;
+          confirmEl.className = 'mk-waitlist-message mk-waitlist-message--error';
+          confirmEl.textContent = msg || 'Something went wrong. Please try again.';
+          confirmEl.style.display = 'block';
+          if (formRow) formRow.style.display = '';
+          if (noteEl) noteEl.style.display = '';
+        }
+
+        var observer = new MutationObserver(function() {
+          if (successEl && successEl.style.display === 'block') showConfirm();
+          if (errorEl && errorEl.style.display === 'block') showError(errorEl.innerText || 'Please try again.');
+        });
+        if (successEl) observer.observe(successEl, { attributes: true, attributeFilter: ['style'] });
+        if (errorEl) observer.observe(errorEl, { attributes: true, attributeFilter: ['style'] });
+      })();
+    </script>
+  </body>
+</html>
+
