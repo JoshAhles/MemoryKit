@@ -215,10 +215,10 @@ body.mk-body {
 .mk-brain-canvas.mk-brain-floating {
   position: absolute;
   top: 50%;
-  right: -60px;
+  right: -20px;
   transform: translateY(-50%);
-  width: 420px;
-  height: 420px;
+  width: 550px;
+  height: 550px;
   pointer-events: none;
   z-index: 0;
   background: transparent;
