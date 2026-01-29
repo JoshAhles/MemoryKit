@@ -8,6 +8,7 @@ const DEBUG = /[?&]debug=1/.test(location.search);
 
 const SCAN_SPEED = 80;
 const SCAN_WIDTH = 15;
+const LOADING_ROTATION_SPEED = 0.07; // rad/s continuous gentle spin
 const PARTICLE_STEP = 8;
 const PLACEHOLDER_RADIUS = 70;
 const PLACEHOLDER_DETAIL = 2;
@@ -15,17 +16,21 @@ const PLACEHOLDER_DECIMATE = 2;
 const POINT_SIZE_BASE = 2.2;
 const POINT_SIZE_REF_DIST = 300;
 
-/** Take every step-th vertex for a lighter points cloud. */
+/** Take every step-th vertex for a lighter points cloud; copies normals when present. */
 function decimateForPoints(geometry, step) {
   const pos = geometry.attributes.position;
   if (!pos) return null;
+  const norm = geometry.attributes.normal;
   const count = pos.count;
   const outPos = [];
+  const outNorm = norm ? [] : null;
   for (let i = 0; i < count; i += step) {
     outPos.push(pos.getX(i), pos.getY(i), pos.getZ(i));
+    if (norm) outNorm.push(norm.getX(i), norm.getY(i), norm.getZ(i));
   }
   const decimated = new THREE.BufferGeometry();
   decimated.setAttribute("position", new THREE.Float32BufferAttribute(outPos, 3));
+  if (outNorm) decimated.setAttribute("normal", new THREE.Float32BufferAttribute(outNorm, 3));
   return decimated;
 }
 
@@ -297,19 +302,6 @@ export function initBrainScene(canvas) {
         brainGroup.remove(placeholderPoints);
         placeholderPointsGeo.dispose();
         brainGroup.add(brainPoints);
-        const xRayMat = new THREE.MeshBasicMaterial({
-          color: 0x84ccff,
-          transparent: true,
-          opacity: 0,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-          side: THREE.BackSide,
-        });
-        const xRayGeo = mergedGeo.clone();
-        const xRayMesh = new THREE.Mesh(xRayGeo, xRayMat);
-        xRayMesh.scale.setScalar(1.03);
-        brainGroup.add(xRayMesh);
-        scene.userData.xRayMat = xRayMat;
         mergedGeo.dispose();
         if (DEBUG) console.log("[brain] real brain visible", `${(performance.now() - t0).toFixed(0)}ms`, `build: ${(performance.now() - tBuild).toFixed(0)}ms`);
       };
@@ -357,6 +349,9 @@ export function initBrainScene(canvas) {
 
     const t = now / 1000;
 
+    // Continuous rotation (loading + scan-in)
+    brainGroup.rotation.y += LOADING_ROTATION_SPEED * dt;
+
     // Scan animation (bottom to top)
     if (scanState.phase === "scanning") {
       scanState.scanY += scanState.scanSpeed * dt;
@@ -377,11 +372,6 @@ export function initBrainScene(canvas) {
         controls.autoRotate = true;
         pathwaysGroup.visible = true;
         if (DEBUG) console.log("[brain] scan complete", `${(performance.now() - t0).toFixed(0)}ms`);
-        
-        // Fade in x-ray shell
-        if (scene.userData.xRayMat) {
-          scene.userData.xRayMat.opacity = 0.1;
-        }
       }
     }
 
