@@ -14,3 +14,7 @@ node_modules/
 
 # Optional: keep third_party vendored assets clean
 third_party/**/.git/
+
+.env
+.env.*
+!.env.example
