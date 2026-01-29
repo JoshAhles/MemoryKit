@@ -1,6 +1,5 @@
 import { initBrainScene } from "./brainScene.js";
 import { initWaitlistForm } from "./waitlistForm.js";
-import { initScrollEffects } from "./scrollEffects.js";
 
 const DEBUG = /[?&]debug=1/.test(location.search);
 window.__pageLoadTime = performance.now();
@@ -23,6 +22,4 @@ window.addEventListener("DOMContentLoaded", () => {
   if (form instanceof HTMLFormElement && messageElement && emailInput instanceof HTMLInputElement) {
     initWaitlistForm({ form, messageElement, emailInput, formRow, noteElement });
   }
-
-  initScrollEffects();
 });

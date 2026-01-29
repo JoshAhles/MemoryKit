@@ -374,14 +374,27 @@ body.mk-body {
 }
 
 @media (max-width: 880px) {
-  .mk-brain-canvas.mk-brain-floating {
-    position: fixed;
+  .mk-hero {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 32px;
+  }
+
+  .mk-hero-copy {
+    max-width: none;
+  }
+
+  /* Brain in flow below copy, visible and sized for mobile */
+  .mk-brain-frame.mk-brain-floating {
+    position: relative;
     left: auto;
-    top: 50%;
-    right: -20%;
-    width: 80%;
-    height: 60%;
-    opacity: 0.4;
+    top: auto;
+    width: 100%;
+    max-width: 320px;
+    height: 280px;
+    margin: 0 auto;
+    transform: none;
+    flex-shrink: 0;
   }
 
   .mk-page {
@@ -393,6 +406,11 @@ body.mk-body {
   .mk-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .mk-brain-frame.mk-brain-floating {
+    height: 240px;
+    max-width: 280px;
   }
 
   .mk-waitlist-row {
