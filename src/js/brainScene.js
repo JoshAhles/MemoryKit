@@ -331,6 +331,7 @@ export function initBrainScene(canvas) {
   let cycleTime = 0;
   const cycleDuration = 8;
   let firstRenderLogged = false;
+  let frameShown = false;
   let frameCount = 0;
   let lastLogTime = performance.now();
 
@@ -339,6 +340,11 @@ export function initBrainScene(canvas) {
     if (DEBUG && !firstRenderLogged) {
       console.log("[brain] first render frame", `${(frameStart - t0).toFixed(0)}ms`);
       firstRenderLogged = true;
+    }
+    // Show frame only after first draw to avoid white canvas flash on reload
+    if (!frameShown && canvas.parentElement) {
+      frameShown = true;
+      canvas.parentElement.classList.add("is-ready");
     }
     now = now || frameStart;
     const dt = (now - lastTime) / 1000;

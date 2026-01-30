@@ -21,6 +21,7 @@ export function initWaitlistForm({ form, messageElement, emailInput, formRow = n
 
     if (!isValidEmail(email)) {
       event.preventDefault();
+      event.stopImmediatePropagation(); // prevent Brevo's submit listener from sending the request (avoids 400 in console)
       emailInput.classList.add("mk-input--error");
       messageElement.textContent = "Please enter a valid email address.";
       messageElement.classList.add("mk-waitlist-message--error");
@@ -35,7 +36,15 @@ export function initWaitlistForm({ form, messageElement, emailInput, formRow = n
     messageElement.style.display = "block";
     if (formRow) formRow.style.display = "none";
     if (noteElement) noteElement.style.display = "none";
-    // Do not preventDefault: Brevo's script handles submission; MutationObserver in index.html shows final success/error.
-  });
+    // Let Brevo handle submit; we show success once they've clicked through with a valid email.
+    setTimeout(() => {
+      messageElement.textContent = "You're on the list. We'll only email when there's something meaningful.";
+      messageElement.classList.remove("mk-waitlist-message--error");
+      messageElement.classList.add("mk-waitlist-message--success");
+      messageElement.style.display = "block";
+      if (formRow) formRow.style.display = "none";
+      if (noteElement) noteElement.style.display = "none";
+    }, 1500);
+  }, true); // capture phase so we run before Brevo's listener
 }
 

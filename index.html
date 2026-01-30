@@ -146,11 +146,11 @@
         }
 
         var observer = new MutationObserver(function() {
-          if (successEl && successEl.style.display === 'block') showConfirm();
-          if (errorEl && errorEl.style.display === 'block') showError(errorEl.innerText || 'Please try again.');
+          if (successEl && window.getComputedStyle(successEl).display !== 'none') showConfirm();
+          if (errorEl && window.getComputedStyle(errorEl).display !== 'none') showError(errorEl.innerText || 'Please try again.');
         });
-        if (successEl) observer.observe(successEl, { attributes: true, attributeFilter: ['style'] });
-        if (errorEl) observer.observe(errorEl, { attributes: true, attributeFilter: ['style'] });
+        if (successEl) observer.observe(successEl, { attributes: true, attributeFilter: ['style', 'class'] });
+        if (errorEl) observer.observe(errorEl, { attributes: true, attributeFilter: ['style', 'class'] });
       })();
     </script>
   </body>
