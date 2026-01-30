@@ -57,17 +57,24 @@ body.mk-body {
   gap: 32px;
 }
 
-/* Mobile: allow scroll so content stays visible when keyboard opens */
+/* Mobile: full-height layout so brain fills under waitlist; scroll when keyboard opens */
 @media (max-width: 880px) {
   html,
   body {
     min-height: 100%;
+  }
+
+  .mk-page {
+    height: 100vh;
+    min-height: 100vh;
+    overflow: auto;
   }
 }
 
 @supports (height: 100dvh) {
   @media (max-width: 880px) {
     .mk-page {
+      height: 100dvh;
       min-height: 100dvh;
     }
   }
@@ -435,7 +442,6 @@ body.mk-body {
     left: auto;
     top: auto;
     width: 100%;
-    max-width: 280px;
     height: 0;
     min-height: 140px;
     flex: 1;
@@ -469,7 +475,6 @@ body.mk-body {
 
   .mk-brain-frame.mk-brain-floating {
     min-height: 100px;
-    max-width: 220px;
   }
 
   .mk-waitlist-row {
