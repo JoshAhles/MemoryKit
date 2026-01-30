@@ -18,3 +18,4 @@ third_party/**/.git/
 .env
 .env.*
 !.env.example
+]

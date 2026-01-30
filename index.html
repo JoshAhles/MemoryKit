@@ -55,10 +55,12 @@
             portable across LLMs, models, and tools.
           </p>
 
-          <div class="mk-hero-reinforce">
-            <p>Memory should persist.</p>
-            <p>You should own it.</p>
-            <p>Your AI should adapt to you.</p>
+          <div class="mk-hero-reinforce" aria-live="polite" aria-atomic="true">
+            <div class="mk-hero-reinforce-inner">
+              <span class="mk-hero-reinforce-phrase" data-index="0">Memory should persist.</span>
+              <span class="mk-hero-reinforce-phrase" data-index="1">You should own it.</span>
+              <span class="mk-hero-reinforce-phrase" data-index="2">Your AI should adapt to you.</span>
+            </div>
           </div>
 
           <!-- Brevo waitlist form (submits to your Brevo list) -->
@@ -104,6 +106,7 @@
       </footer>
     </main>
 
+    <script src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
     <script type="module" src="src/js/main.js"></script>
     <!-- Brevo form: must load so submissions reach your list -->
     <script>
