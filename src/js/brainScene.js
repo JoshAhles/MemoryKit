@@ -1,5 +1,5 @@
 // Three.js brain scene with MRI scan reveal effect.
-// Placeholder shows immediately; real OBJ is parsed in a Web Worker to avoid blocking the main thread.
+// Only the real brain OBJ is shown; no placeholder (loads in worker, then render starts).
 
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js";
@@ -10,9 +10,6 @@ const SCAN_SPEED = 80;
 const SCAN_WIDTH = 15;
 const LOADING_ROTATION_SPEED = 0.07; // rad/s continuous gentle spin
 const PARTICLE_STEP = 8;
-const PLACEHOLDER_RADIUS = 70;
-const PLACEHOLDER_DETAIL = 2;
-const PLACEHOLDER_DECIMATE = 2;
 const POINT_SIZE_BASE = 2.2;
 const POINT_SIZE_REF_DIST = 300;
 
@@ -230,7 +227,7 @@ export function initBrainScene(canvas) {
   logPerf("nodes", t);
   logPerf("initBrainScene sync total", t0);
 
-  // State for scan animation (bottom to top)
+  // State for scan animation (bottom to top); set when brain loads
   let scanState = {
     phase: "scanning",
     scanY: -120,
@@ -239,37 +236,14 @@ export function initBrainScene(canvas) {
     startTime: performance.now(),
   };
 
-  // Store refs for materials (used by render loop for uScanY)
   let brainPointsMaterial = null;
 
-  // --- Placeholder: show a brain-like shape and start render loop immediately ---
-  const placeholderGeo = new THREE.IcosahedronGeometry(PLACEHOLDER_RADIUS, PLACEHOLDER_DETAIL);
-  const placeholderPointsGeo = decimateForPoints(placeholderGeo, PLACEHOLDER_DECIMATE);
-  placeholderGeo.dispose();
-  brainPointsMaterial = new THREE.ShaderMaterial({
-    uniforms: {
-      uScanY: { value: scanState.scanY },
-      uScanWidth: { value: SCAN_WIDTH },
-      uColor: { value: new THREE.Color(0xe2e8ef) },
-      uScanColor: { value: new THREE.Color(0x38bdf8) },
-      uOpacity: { value: 0.9 },
-    },
-    vertexShader: scanVertexShader,
-    fragmentShader: scanFragmentShader,
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-  });
-  const placeholderPoints = new THREE.Points(placeholderPointsGeo, brainPointsMaterial);
-  placeholderPoints.frustumCulled = false;
-  brainGroup.add(placeholderPoints);
-  brainGroup.rotation.y = Math.PI / 2;
-  scene.userData.placeholderBrain = placeholderPoints;
-  if (DEBUG) console.log("[brain] placeholder visible, render loop starting", `${(performance.now() - t0).toFixed(0)}ms`);
-  requestAnimationFrame(render);
-
-  // --- Load real brain in worker (non-blocking) ---
+  // --- Load brain OBJ in worker; start render loop only after it's ready ---
   const OBJ_URL = "assets/models/BrainUVs.obj";
+  function startRenderLoop() {
+    requestAnimationFrame(render);
+  }
+
   fetch(OBJ_URL)
     .then((res) => {
       if (!res.ok) throw new Error(`OBJ fetch ${res.status}`);
@@ -284,6 +258,7 @@ export function initBrainScene(canvas) {
         worker.terminate();
         if (error || !positions || !normals) {
           console.warn("[brain] worker error or empty result", error);
+          startRenderLoop();
           return;
         }
         const tBuild = performance.now();
@@ -296,23 +271,38 @@ export function initBrainScene(canvas) {
         scanState.scanY = bbox.min.y - 10;
         scanState.maxY = bbox.max.y + 10;
         const particleGeo = decimateForPoints(mergedGeo, PARTICLE_STEP);
-        brainPointsMaterial.uniforms.uScanY.value = scanState.scanY;
+        brainPointsMaterial = new THREE.ShaderMaterial({
+          uniforms: {
+            uScanY: { value: scanState.scanY },
+            uScanWidth: { value: SCAN_WIDTH },
+            uColor: { value: new THREE.Color(0xe2e8ef) },
+            uScanColor: { value: new THREE.Color(0x38bdf8) },
+            uOpacity: { value: 0.9 },
+          },
+          vertexShader: scanVertexShader,
+          fragmentShader: scanFragmentShader,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
         const brainPoints = new THREE.Points(particleGeo, brainPointsMaterial);
         brainPoints.frustumCulled = false;
-        brainGroup.remove(placeholderPoints);
-        placeholderPointsGeo.dispose();
+        brainGroup.rotation.y = Math.PI / 2;
         brainGroup.add(brainPoints);
         mergedGeo.dispose();
-        if (DEBUG) console.log("[brain] real brain visible", `${(performance.now() - t0).toFixed(0)}ms`, `build: ${(performance.now() - tBuild).toFixed(0)}ms`);
+        if (DEBUG) console.log("[brain] brain visible, starting render", `${(performance.now() - t0).toFixed(0)}ms`, `build: ${(performance.now() - tBuild).toFixed(0)}ms`);
+        startRenderLoop();
       };
       worker.onerror = () => {
         worker.terminate();
-        if (DEBUG) console.warn("[brain] worker error, keeping placeholder");
+        if (DEBUG) console.warn("[brain] worker error");
+        startRenderLoop();
       };
       worker.postMessage(text);
     })
     .catch((err) => {
-      if (DEBUG) console.warn("[brain] OBJ fetch error, keeping placeholder", err);
+      if (DEBUG) console.warn("[brain] OBJ fetch error", err);
+      startRenderLoop();
     });
 
   function resizeRendererToDisplaySize() {
