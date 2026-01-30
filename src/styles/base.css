@@ -57,21 +57,18 @@ body.mk-body {
   gap: 32px;
 }
 
-/* Mobile: fit one screen, no scroll */
+/* Mobile: allow scroll so content stays visible when keyboard opens */
 @media (max-width: 880px) {
   html,
   body {
-    overflow: hidden;
-    overscroll-behavior: none;
+    min-height: 100%;
   }
 }
 
 @supports (height: 100dvh) {
   @media (max-width: 880px) {
     .mk-page {
-      height: 100dvh;
       min-height: 100dvh;
-      overflow: hidden;
     }
   }
 }
