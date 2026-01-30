@@ -94,9 +94,9 @@
           </div>
         </div>
 
-        <!-- Brain in a square frame: canvas fills the frame; outline keeps it clearly in place -->
-        <div class="mk-brain-frame mk-brain-floating" aria-hidden="true">
-          <canvas id="mk-brain-canvas" class="mk-brain-canvas" aria-hidden="true"></canvas>
+        <!-- Brain: frame always visible (dark bg); canvas invisible until first draw; color reset so no inherited mk-fg flash -->
+        <div class="mk-brain-frame mk-brain-floating" aria-hidden="true" style="background: #020617; color: #020617;">
+          <canvas id="mk-brain-canvas" class="mk-brain-canvas" aria-hidden="true" style="opacity: 0; background: #020617; color: #020617;"></canvas>
         </div>
       </section>
 

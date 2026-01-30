@@ -269,7 +269,7 @@ export function initBrainScene(canvas) {
   requestAnimationFrame(render);
 
   // --- Load real brain in worker (non-blocking) ---
-  const OBJ_URL = "third_party/models/BrainUVs.obj";
+  const OBJ_URL = "assets/models/BrainUVs.obj";
   fetch(OBJ_URL)
     .then((res) => {
       if (!res.ok) throw new Error(`OBJ fetch ${res.status}`);
@@ -341,10 +341,10 @@ export function initBrainScene(canvas) {
       console.log("[brain] first render frame", `${(frameStart - t0).toFixed(0)}ms`);
       firstRenderLogged = true;
     }
-    // Show frame only after first draw to avoid white canvas flash on reload
-    if (!frameShown && canvas.parentElement) {
+    // Show canvas only after first draw to avoid white flash (frame stays visible with dark bg)
+    if (!frameShown) {
       frameShown = true;
-      canvas.parentElement.classList.add("is-ready");
+      canvas.style.opacity = "1";
     }
     now = now || frameStart;
     const dt = (now - lastTime) / 1000;

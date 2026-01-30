@@ -335,7 +335,7 @@ body.mk-body {
   background: rgba(15, 23, 42, 0.95);
 }
 
-/* Square frame for the brain — in place, no visible chrome */
+/* Square frame for the brain — in place, no visible chrome; reset inherited body color so no light flash */
 .mk-brain-frame.mk-brain-floating {
   position: absolute;
   top: 50%;
@@ -347,12 +347,8 @@ body.mk-body {
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
-  background: #020617; /* match scene fog so no white flash before first WebGL draw */
-  visibility: hidden; /* show only after first WebGL frame to avoid uninitialized canvas flash */
-}
-
-.mk-brain-frame.mk-brain-floating.is-ready {
-  visibility: visible;
+  background: #020617;
+  color: #020617; /* override body.mk-body color (--mk-fg) so nothing inherits light */
 }
 
 .mk-brain-frame .mk-brain-canvas {
@@ -361,6 +357,8 @@ body.mk-body {
   height: 100%;
   pointer-events: none;
   background: #020617;
+  color: #020617;
+  transition: opacity 0.15s ease-out;
 }
 
 .mk-hero {
