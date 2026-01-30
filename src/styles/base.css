@@ -57,6 +57,17 @@ body.mk-body {
   gap: 32px;
 }
 
+/* Mobile: fit one screen, no scroll */
+@supports (height: 100dvh) {
+  @media (max-width: 880px) {
+    .mk-page {
+      height: 100dvh;
+      min-height: 100dvh;
+      overflow: hidden;
+    }
+  }
+}
+
 .mk-header {
   display: flex;
   align-items: center;
@@ -384,43 +395,67 @@ body.mk-body {
 }
 
 @media (max-width: 880px) {
+  .mk-page {
+    padding: 14px 16px 10px;
+    gap: 14px;
+  }
+
   .mk-hero {
     flex-direction: column;
     align-items: stretch;
-    gap: 32px;
+    gap: 18px;
+    min-height: 0;
+    flex: 1;
   }
 
   .mk-hero-copy {
     max-width: none;
+    gap: 12px;
+    min-height: 0;
+    flex-shrink: 0;
   }
 
-  /* Brain in flow below copy, visible and sized for mobile */
+  /* Brain in flow below copy; fills remaining space so page fits viewport */
   .mk-brain-frame.mk-brain-floating {
     position: relative;
     left: auto;
     top: auto;
     width: 100%;
-    max-width: 320px;
-    height: 280px;
+    max-width: 280px;
+    height: 0;
+    min-height: 140px;
+    flex: 1;
     margin: 0 auto;
     transform: none;
-    flex-shrink: 0;
-  }
-
-  .mk-page {
-    padding-inline: 16px;
   }
 }
 
 @media (max-width: 640px) {
+  .mk-page {
+    padding: 10px 14px 8px;
+    gap: 10px;
+  }
+
   .mk-header {
     flex-direction: column;
     align-items: flex-start;
   }
 
+  .mk-hero-copy {
+    gap: 10px;
+  }
+
+  .mk-hero-title {
+    font-size: clamp(1.75rem, 5vw, 2.2rem);
+  }
+
+  .mk-hero-subtitle {
+    font-size: 0.9rem;
+  }
+
   .mk-brain-frame.mk-brain-floating {
-    height: 240px;
-    max-width: 280px;
+    min-height: 100px;
+    max-width: 220px;
   }
 
   .mk-waitlist-row {
@@ -431,5 +466,10 @@ body.mk-body {
   .mk-button-primary {
     width: 100%;
     justify-content: center;
+  }
+
+  .mk-footer {
+    padding-top: 8px;
+    font-size: 0.72rem;
   }
 }
